@@ -1,0 +1,72 @@
+# ==================== #
+#   通用开发环境忽略规则    #
+# ==================== #
+
+# IDE/编辑器缓存
+**/.vs/
+**/.vscode/
+**/*.sublime-*
+**/*.swp
+**/*.swo
+
+# 系统文件
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+
+# ==================== #
+#    TeamViewer QML    #
+# ==================== #
+**/cache/TeamViewer/qmlcache/*
+*.qmlc
+*.qmlcache
+
+# ==================== #
+#     Protege 日志      #
+# ==================== #
+**/Protege/logs/protege.log
+**/Protege/logs/*.log
+
+# ==================== #
+#     C++项目配置       #
+# ==================== #
+# CMake 生成文件
+build/
+out/
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+Makefile
+
+# 编译产物
+*.so
+*.a
+*.dylib
+*.exe
+*.dll
+*.o
+*.obj
+*.ilk
+*.pdb
+*.user
+
+# 二进制差异文件
+*.orig
+*.rej
+
+# ==================== #
+#     前端项目配置       #
+# ==================== #
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-error.log
+package-lock.json
+
+# ==================== #
+#   实验性目录/文件      #
+# ==================== #
+void-elements/
+*.tmp
+*.bak
+**/TeamViewerbam* 
