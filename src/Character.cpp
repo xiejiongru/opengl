@@ -6,6 +6,7 @@ void Character::Draw() const {
     glPushMatrix();
     glTranslatef(position[0], position[1]+1, position[2]);
     glRotatef(rotation, 0, 1, 0);
+    glScalef(0.8f, 0.2f, 0.8f); // 扁平化
     
     glBegin(GL_TRIANGLES);
     // 底面（四边形分解为两个三角形）

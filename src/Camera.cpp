@@ -6,7 +6,7 @@
 
 // 原 SetupView 实现保持不变
 void Camera::SetupView(const Character& character) const {
-    const float camDistance = 25.0f;
+    const float camDistance = 15.0f;
     const float lookAhead = 5.0f;
     const float radians = glm::radians(character.rotation);
     

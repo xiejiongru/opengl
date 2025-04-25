@@ -49,7 +49,13 @@ void Terrain::Generate() {
             heightMap[x][z] = static_cast<int>(abs(noise)*4) + 2;
         }
     }
-    
+        // 增加平滑滤波
+        for(int z = 1; z < SIZE-1; z++){
+            for(int x = 1; x < SIZE-1; x++){
+                heightMap[x][z] = (heightMap[x-1][z] + heightMap[x+1][z] 
+                                + heightMap[x][z-1] + heightMap[x][z+1]) / 4;
+            }
+        }
     // Generate instance matrices
     GenerateInstanceMatrices();
 }
@@ -59,8 +65,8 @@ void Terrain::Draw() const {
     glPushMatrix();
     
     // Only draw some cubes for better performance during testing
-    for (int z = 0; z < SIZE; z += 2) {
-        for (int x = 0; x < SIZE; x += 2) {
+    for (int z = 0; z < SIZE; z ++) {
+        for (int x = 0; x < SIZE; x ++) {
             int height = heightMap[x][z];
             for (int y = 0; y < height; y++) {
                 glPushMatrix();
