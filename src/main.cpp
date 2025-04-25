@@ -22,29 +22,32 @@ void display() {
     glutSwapBuffers();
 }
 
-void keyboard(unsigned char key, int x, int y) {
+void keyboard(unsigned char key, int, int) {
+    const float moveSpeed = 0.5f;
+    const float rotateSpeed = 5.0f;
+    
     switch(key) {
-        case 'a': 
-            character.Move(-0.5, 0, terrain);
-            character.rotation -= 5; 
+        case 'q': // 左转
+            character.rotation += rotateSpeed;
             break;
-        case 'd': 
-            character.Move(0.5, 0, terrain);
-            character.rotation += 5; 
+        case 'e': // 右转
+            character.rotation -= rotateSpeed;
             break;
-        case 'w': 
-            character.Move(0, -0.5, terrain); 
+        case 'a': // 左平移
+            character.Move(-moveSpeed, 0, terrain); 
             break;
-        case 's': 
-            character.Move(0, 0.5, terrain); 
+        case 'd': // 右平移
+            character.Move(moveSpeed, 0, terrain);
             break;
-        case 27:  // ESC key - exit program
-            exit(0);
+        case 'w': // 前进
+            character.Move(0, moveSpeed, terrain);
+            break;
+        case 's': // 后退
+            character.Move(0, -moveSpeed, terrain);
             break;
     }
     glutPostRedisplay();
 }
-
 void reshape(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);

@@ -1,4 +1,5 @@
 #pragma once
+#include "Terrain.h" 
 
 class Terrain;  // 前向声明
 

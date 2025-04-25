@@ -28,6 +28,12 @@ void Terrain::Initialize() {
     }
 }
 
+bool Terrain::IsPositionValid(float x, float z) const {
+    const float buffer = 0.3f; // 边界缓冲
+    return (x >= buffer && x <= SIZE - 1 - buffer) && 
+           (z >= buffer && z <= SIZE - 1 - buffer);
+}
+
 float Terrain::fractal_noise(float x, float z) {
     float total = 0;
     float freq = 1.0, amp = 0.5;

@@ -18,6 +18,7 @@ public:
     void Generate();
     void Draw() const;
     int GetHeight(float x, float z) const;
+    bool IsPositionValid(float x, float z) const;
     void GenerateInstanceMatrices();
     
 private:
