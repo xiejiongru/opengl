@@ -1,5 +1,6 @@
 #pragma once
-#include <GL/gl.h>
+
+class Terrain;  // 前向声明
 
 class Character {
 public:
@@ -7,5 +8,5 @@ public:
     float rotation = 0.0f;
     
     void Draw() const;
-    void Move(float dx, float dz);
+    void Move(float dx, float dz, const Terrain& terrain);  // 传入地形引用
 };

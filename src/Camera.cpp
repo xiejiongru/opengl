@@ -1,22 +1,30 @@
 #include "Camera.h"
 #include "Character.h"
-
 #include <GL/glu.h>
 #include <cmath>
 #include <glm/glm.hpp>
 
+// 原 SetupView 实现保持不变
 void Camera::SetupView(const Character& character) const {
-    // 45度俯视视角
-    const float cameraHeight = 30.0f;
-    const float lookAhead = 10.0f;
-
+    const float camDistance = 25.0f;
+    const float lookAhead = 5.0f;
+    const float radians = glm::radians(character.rotation);
+    
     gluLookAt(
+        character.position[0] - camDistance * sin(radians),
+        character.position[1] + 15.0f,
+        character.position[2] - camDistance * cos(radians),
         character.position[0] - lookAhead, 
-        character.position[1] + cameraHeight,
+        character.position[1] + 5.0f,
         character.position[2] - lookAhead,
-        character.position[0] + lookAhead/2,  // 视角焦点前移
-        character.position[1],
-        character.position[2] + lookAhead/2,
         0, 1, 0
     );
+}
+
+// 新增 UpdateFrontVector 实现
+void Camera::UpdateFrontVector() {
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front = glm::normalize(front);
 }

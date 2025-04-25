@@ -1,17 +1,30 @@
 #include "Terrain.h"
+#include "InstancedRenderer.h"
+#include "Cube.h"           
 #include <GL/gl.h>
 #include <cmath>
 #include <ctime>
 #include <glm/glm.hpp> 
+#include <glm/gtc/matrix_transform.hpp>  
 #include <GL/glut.h>
+
+float Terrain::fractal_noise(float x, float z) {  // 作为成员函数实现
+    float total = 0;
+    float freq = 1.0, amp = 0.5;
+    for(int i=0; i<4; i++) {
+        total += amp * sin(x*freq) * cos(z*freq*0.7);
+        freq *= 2.0;
+        amp *= 0.5;
+    }
+    return total;
+}
 
 void Terrain::Generate() {
     srand(time(0));
     for(int z = 0; z < SIZE; z++) {
         for(int x = 0; x < SIZE; x++) {
-            // 使用简单三角函数生成地形
-            float noise = 0.5f * sin(x*0.5f) + 0.5f * cos(z*0.3f);
-            heightMap[x][z] = static_cast<int>((noise + 1) * 3) + 2;
+            float noise = fractal_noise(x*0.1f, z*0.1f);  // 使用成员函数
+            heightMap[x][z] = static_cast<int>(abs(noise)*4) + 2;
         }
     }
 }
@@ -33,10 +46,11 @@ void DrawCube() {
                             {1,5,6,2}, {4,5,1,0}, {3,2,6,7}};
     
     // 随机生成三原色组合
-    const GLfloat colors[][3] = {
-        {0.9f, 0.1f, 0.1f},  // 红
+    const GLfloat colors[][3] = 
+    {
+        {0.8f, 0.2f, 0.1f},  // 红
         {0.1f, 0.1f, 0.9f},  // 蓝 
-        {0.9f, 0.9f, 0.1f}   // 黄
+        {0.9f, 0.6f, 0.1f}   // 黄
     };
     
     // 按高度选择颜色
@@ -52,6 +66,17 @@ void DrawCube() {
     glEnd();
 }
 void Terrain::Draw() const {
+
+    // 绘制坐标轴
+    glBegin(GL_LINES);
+    glColor3f(1,0,0); // X轴红色
+    glVertex3f(0,0,0); glVertex3f(10,0,0);
+    glColor3f(0,1,0); // Y轴绿色
+    glVertex3f(0,0,0); glVertex3f(0,10,0);
+    glColor3f(0,0,1); // Z轴蓝色
+    glVertex3f(0,0,0); glVertex3f(0,0,10);
+    glEnd();
+    
     for(int z = 0; z < SIZE; z++) {
         for(int x = 0; x < SIZE; x++) {
             int height = heightMap[x][z];
@@ -64,3 +89,26 @@ void Terrain::Draw() const {
         }
     }
 }
+
+int Terrain::GetHeight(float x, float z) const {
+    int ix = static_cast<int>(x);
+    int iz = static_cast<int>(z);
+    if (ix >= 0 && ix < SIZE && iz >= 0 && iz < SIZE) {
+        return heightMap[ix][iz];
+    }
+    return 0; // 越界返回0
+}
+
+void Terrain::GenerateInstanceMatrices() {
+    cubeInstances.clear();
+    for (int z = 0; z < SIZE; z++) {
+        for (int x = 0; x < SIZE; x++) {
+            int height = heightMap[x][z];
+            for (int y = 0; y < height; y++) {
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+                cubeInstances.push_back(model);
+            }
+        }
+    }
+}
+
