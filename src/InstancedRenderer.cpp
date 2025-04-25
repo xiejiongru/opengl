@@ -1,14 +1,47 @@
 #include "InstancedRenderer.h"
 #include "Cube.h"
-#include <GL/glew.h>  // 包含GLEW头文件以访问OpenGL函数
+#include <GL/glew.h>
+#include <iostream>
 
-// 构造函数实现
-InstancedRenderer::InstancedRenderer() {
-    glGenBuffers(1, &instanceVBO);
+// Default constructor - doesn't use OpenGL
+InstancedRenderer::InstancedRenderer() : instanceVBO(0), initialized(false) {
+    // Don't call any OpenGL functions here
 }
 
-void InstancedRenderer::DrawInstanced(const Cube& cube, const std::vector<glm::mat4>& instances) {
+// Initialize OpenGL resources when ready
+void InstancedRenderer::Initialize() {
+    if (!initialized) {
+        glGenBuffers(1, &instanceVBO);
+        initialized = true;
+    }
+}
+
+InstancedRenderer::~InstancedRenderer() {
+    if (initialized && instanceVBO != 0) {
+        glDeleteBuffers(1, &instanceVBO);
+        instanceVBO = 0;
+    }
+}
+
+void InstancedRenderer::DrawInstanced(const Cube& cube, const std::vector<glm::mat4>& instances) const {
+    if (!initialized) {
+        std::cerr << "InstancedRenderer not initialized" << std::endl;
+        return;
+    }
+    
+    if (instances.empty()) {
+        return;
+    }
+    
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), instances.data(), GL_STATIC_DRAW);
-    cube.DrawInstanced(instances.size());
+    glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(glm::mat4), 
+                instances.data(), GL_STATIC_DRAW);
+    
+    // Simple draw elements for now
+    GLuint cubeVAO = cube.GetVAO();
+    if (cubeVAO != 0) {
+        glBindVertexArray(cubeVAO);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
 }

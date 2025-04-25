@@ -1,14 +1,34 @@
 #include "Terrain.h"
 #include "InstancedRenderer.h"
-#include "Cube.h"           
+#include "Cube.h"
 #include <GL/gl.h>
 #include <cmath>
 #include <ctime>
-#include <glm/glm.hpp> 
-#include <glm/gtc/matrix_transform.hpp>  
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <GL/glut.h>
+#include <iostream>
 
-float Terrain::fractal_noise(float x, float z) {  // 作为成员函数实现
+// Add constructor implementation
+Terrain::Terrain() : initialized(false) {
+    // Initialize heightMap to zero
+    for (int z = 0; z < SIZE; z++) {
+        for (int x = 0; x < SIZE; x++) {
+            heightMap[x][z] = 0;
+        }
+    }
+}
+
+// Initialize OpenGL resources
+void Terrain::Initialize() {
+    if (!initialized) {
+        terrainCube.Initialize();
+        instancedRenderer.Initialize();
+        initialized = true;
+    }
+}
+
+float Terrain::fractal_noise(float x, float z) {
     float total = 0;
     float freq = 1.0, amp = 0.5;
     for(int i=0; i<4; i++) {
@@ -21,73 +41,71 @@ float Terrain::fractal_noise(float x, float z) {  // 作为成员函数实现
 
 void Terrain::Generate() {
     srand(time(0));
+    
+    // Generate height map
     for(int z = 0; z < SIZE; z++) {
         for(int x = 0; x < SIZE; x++) {
-            float noise = fractal_noise(x*0.1f, z*0.1f);  // 使用成员函数
+            float noise = fractal_noise(x*0.1f, z*0.1f);
             heightMap[x][z] = static_cast<int>(abs(noise)*4) + 2;
         }
     }
+    
+    // Generate instance matrices
+    GenerateInstanceMatrices();
 }
 
-void DrawCube() {
-    const GLfloat vertices[][3] = {
-        // 只保留8个顶点
-        {-0.5,-0.5,-0.5}, // 0
-        {0.5,-0.5,-0.5},  // 1
-        {0.5,0.5,-0.5},   // 2
-        {-0.5,0.5,-0.5},  // 3
-        {-0.5,-0.5,0.5},  // 4
-        {0.5,-0.5,0.5},   // 5
-        {0.5,0.5,0.5},    // 6
-        {-0.5,0.5,0.5}    // 7
-    };
-    
-    const int faces[6][4] = {{0,1,2,3}, {5,4,7,6}, {4,0,3,7},
-                            {1,5,6,2}, {4,5,1,0}, {3,2,6,7}};
-    
-    // 随机生成三原色组合
-    const GLfloat colors[][3] = 
-    {
-        {0.8f, 0.2f, 0.1f},  // 红
-        {0.1f, 0.1f, 0.9f},  // 蓝 
-        {0.9f, 0.6f, 0.1f}   // 黄
-    };
-    
-    // 按高度选择颜色
-    float time = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
-    int colorIndex = static_cast<int>(std::abs(std::sin(time)) * 3) % 3;
-
-    glBegin(GL_QUADS);
-    for(int i=0; i<6; ++i) {
-        glColor3fv(colors[i]);
-        for(int j=0; j<4; ++j)
-            glVertex3fv(vertices[faces[i][j]]);
-    }
-    glEnd();
-}
 void Terrain::Draw() const {
-
-    // 绘制坐标轴
-    glBegin(GL_LINES);
-    glColor3f(1,0,0); // X轴红色
-    glVertex3f(0,0,0); glVertex3f(10,0,0);
-    glColor3f(0,1,0); // Y轴绿色
-    glVertex3f(0,0,0); glVertex3f(0,10,0);
-    glColor3f(0,0,1); // Z轴蓝色
-    glVertex3f(0,0,0); glVertex3f(0,0,10);
-    glEnd();
+    // Use fixed-function pipeline for now
+    glPushMatrix();
     
-    for(int z = 0; z < SIZE; z++) {
-        for(int x = 0; x < SIZE; x++) {
+    // Only draw some cubes for better performance during testing
+    for (int z = 0; z < SIZE; z += 2) {
+        for (int x = 0; x < SIZE; x += 2) {
             int height = heightMap[x][z];
-            for(int y = 0; y < height; y++) {
+            for (int y = 0; y < height; y++) {
                 glPushMatrix();
                 glTranslatef(x, y, z);
-                DrawCube();
+                
+                // Draw a simple colored cube
+                glBegin(GL_QUADS);
+                // Front face (red)
+                glColor3f(0.8f, 0.2f, 0.1f);
+                glVertex3f(-0.5f, -0.5f, 0.5f);
+                glVertex3f(0.5f, -0.5f, 0.5f);
+                glVertex3f(0.5f, 0.5f, 0.5f);
+                glVertex3f(-0.5f, 0.5f, 0.5f);
+                
+                // Back face (blue)
+                glColor3f(0.1f, 0.1f, 0.9f);
+                glVertex3f(-0.5f, -0.5f, -0.5f);
+                glVertex3f(-0.5f, 0.5f, -0.5f);
+                glVertex3f(0.5f, 0.5f, -0.5f);
+                glVertex3f(0.5f, -0.5f, -0.5f);
+                
+                // Top face (yellow)
+                glColor3f(0.9f, 0.9f, 0.1f);
+                glVertex3f(-0.5f, 0.5f, -0.5f);
+                glVertex3f(-0.5f, 0.5f, 0.5f);
+                glVertex3f(0.5f, 0.5f, 0.5f);
+                glVertex3f(0.5f, 0.5f, -0.5f);
+                glEnd();
+                
                 glPopMatrix();
             }
         }
     }
+    
+    // Draw coordinate axes
+    glBegin(GL_LINES);
+    glColor3f(1,0,0);
+    glVertex3f(0,0,0); glVertex3f(10,0,0);
+    glColor3f(0,1,0);
+    glVertex3f(0,0,0); glVertex3f(0,10,0);
+    glColor3f(0,0,1);
+    glVertex3f(0,0,0); glVertex3f(0,0,10);
+    glEnd();
+    
+    glPopMatrix();
 }
 
 int Terrain::GetHeight(float x, float z) const {
@@ -96,7 +114,7 @@ int Terrain::GetHeight(float x, float z) const {
     if (ix >= 0 && ix < SIZE && iz >= 0 && iz < SIZE) {
         return heightMap[ix][iz];
     }
-    return 0; // 越界返回0
+    return 0;
 }
 
 void Terrain::GenerateInstanceMatrices() {
@@ -111,4 +129,3 @@ void Terrain::GenerateInstanceMatrices() {
         }
     }
 }
-

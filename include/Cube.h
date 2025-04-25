@@ -1,15 +1,19 @@
 #pragma once
-#include <GL/glew.h> 
-#include <glm/glm.hpp>
+#include <GL/glew.h>
 
 class Cube {
 public:
-    Cube();  
-    ~Cube(); 
+    Cube();
+    ~Cube();
+    
+    // Add initialization method
+    void Initialize();
+    GLuint GetVAO() const { return vao; }
     void DrawInstanced(int instanceCount) const;
 
 private:
-    GLuint vao;  // 顶点数组对象
-    GLuint vbo;  // 顶点缓冲区
-    GLuint ebo;  // 元素缓冲区
+    GLuint vao;
+    GLuint vbo;
+    GLuint ebo;
+    bool initialized;
 };
