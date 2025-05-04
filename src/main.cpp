@@ -10,6 +10,8 @@
 Camera camera;
 Character character;
 Terrain terrain;
+int frameCount = 0;
+int lastFpsTime = 0;
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -20,6 +22,19 @@ void display() {
     character.Draw();
     
     glutSwapBuffers();
+
+    // FPS calculation
+    int currentTime = glutGet(GLUT_ELAPSED_TIME);
+    frameCount++;
+    
+    if (currentTime - lastFpsTime >= 1000) { // Update every second
+        float fps = frameCount * 1000.0f / (currentTime - lastFpsTime);
+        char title[128];
+        snprintf(title, sizeof(title), "Voxel World - FPS: %.1f", fps);
+        glutSetWindowTitle(title);
+        lastFpsTime = currentTime;
+        frameCount = 0;
+    }
 }
 
 void keyboard(unsigned char key, int, int) {
@@ -27,22 +42,22 @@ void keyboard(unsigned char key, int, int) {
     const float rotateSpeed = 5.0f;
     
     switch(key) {
-        case 'q': // 左转
+        case 'q': // Turn left
             character.rotation += rotateSpeed;
             break;
-        case 'e': // 右转
+        case 'e': // Turn right
             character.rotation -= rotateSpeed;
             break;
-        case 'a': // 左平移
+        case 'a': // Move left
             character.Move(-moveSpeed, 0, terrain); 
             break;
-        case 'd': // 右平移
+        case 'd': // Move right
             character.Move(moveSpeed, 0, terrain);
             break;
-        case 'w': // 前进
+        case 'w': // Move forward
             character.Move(0, moveSpeed, terrain);
             break;
-        case 's': // 后退
+        case 's': // Move backward
             character.Move(0, -moveSpeed, terrain);
             break;
     }

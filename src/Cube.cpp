@@ -2,9 +2,9 @@
 #include <GL/glew.h>
 #include <iostream>
 
-// Default constructor - doesn't use OpenGL
+// Default constructor - does not use OpenGL
 Cube::Cube() : vao(0), vbo(0), ebo(0), initialized(false) {
-    // Don't call any OpenGL functions here
+    // Do not call any OpenGL functions here
 }
 
 // Initialize OpenGL resources when ready

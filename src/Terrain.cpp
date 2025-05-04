@@ -29,7 +29,7 @@ void Terrain::Initialize() {
 }
 
 bool Terrain::IsPositionValid(float x, float z) const {
-    const float buffer = 0.3f; // 边界缓冲
+    const float buffer = 0.3f; // Boundary buffer
     return (x >= buffer && x <= SIZE - 1 - buffer) && 
            (z >= buffer && z <= SIZE - 1 - buffer);
 }
@@ -55,7 +55,7 @@ void Terrain::Generate() {
             heightMap[x][z] = static_cast<int>(abs(noise)*4) + 2;
         }
     }
-        // 增加平滑滤波
+        // Increase smoothing filter
         for(int z = 1; z < SIZE-1; z++){
             for(int x = 1; x < SIZE-1; x++){
                 heightMap[x][z] = (heightMap[x-1][z] + heightMap[x+1][z] 

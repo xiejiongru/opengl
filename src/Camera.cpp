@@ -4,7 +4,6 @@
 #include <cmath>
 #include <glm/glm.hpp>
 
-// 原 SetupView 实现保持不变
 void Camera::SetupView(const Character& character) const {
     const float camDistance = 15.0f;
     const float lookAhead = 5.0f;
@@ -21,7 +20,7 @@ void Camera::SetupView(const Character& character) const {
     );
 }
 
-// 新增 UpdateFrontVector 实现
+// New UpdateFrontVector implementation
 void Camera::UpdateFrontVector() {
     front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
     front.y = sin(glm::radians(pitch));
